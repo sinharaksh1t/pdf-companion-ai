@@ -47,12 +47,16 @@ export default function PdfUploader() {
 
   const handleAsk = async () => {
     if (!question || !extractedText) return;
+    console.log(question, extractedText);
 
     try {
       const response = await fetch("http://localhost:8000/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, document_text: extractedText }),
+        body: JSON.stringify({
+          question: question,
+          document_text: extractedText,
+        }),
       });
 
       const data = await response.json();

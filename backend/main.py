@@ -11,7 +11,10 @@ from utils.pdf_processor import extract_text_from_pdf
 load_dotenv()
 
 # Set OpenAI API key
-openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai_client = OpenAI(
+    base_url="https://api.groq.com/openai/v1", api_key=os.getenv("GROQ_API_KEY")
+)
 
 
 app = FastAPI()
@@ -48,24 +51,24 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 
 @app.post("/ask")
-async def ask_question(question: str, document_text: str):
+async def ask_question(
+    question: str = "What is this doc about?", document_text: str = "My name is Jeff"
+):
     """Process the user's question with OpenAI."""
-    print(question)
-    print(document_text[:20])
     try:
         # response = openai_client.chat.completions.create(
-        #     model="gpt-4o-mini",  # Or whichever model you prefer
+        #     # model="gpt-4o-mini",  # Or whichever model you prefer
+        #     model="llama-guard-3-8b",  # Or whichever model you prefer
         #     messages=[
         #         {
         #             "role": "user",
-        #             "content": "Say this is a test",
+        #             "content": f"Answer the following question based on the document text:\n\n{document_text}\n\nQuestion: {question}",
         #         }
         #     ],
-        #     response_format={"type": "json_object"},
+        #     # response_format={"type": "json_object"},
         # )
-        # # prompt=f"Answer the following question based on the document text:\n\n{document_text}\n\nQuestion: {question}",
-        # # max_tokens=150,
-        # answer = response.choices[0].text.strip()
-        return {"answer": "hello this is the answer"}
+        # # # max_tokens=150,
+        # answer = response.choices[0].message.content
+        return {"answer": f"Hi my name is: {question}, {document_text[:20]}"}
     except Exception as e:
         return {"error": str(e)}
