@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+*.env/
+
+# Node.js
+node_modules/
+dist/
+
+# Editor-specific
+.vscode/
+.idea/
+
+# Archived
+*archive*
+
+# Uploaded files
+uploads/
