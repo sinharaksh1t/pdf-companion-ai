@@ -47,7 +47,6 @@ export default function PdfUploader() {
 
   const handleAsk = async () => {
     if (!question || !extractedText) return;
-    console.log(question, extractedText);
 
     try {
       const response = await fetch("http://localhost:8000/ask", {

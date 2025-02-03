@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
+from pydantic import BaseModel
 from utils.pdf_processor import extract_text_from_pdf
 
 # Load environment variables
@@ -45,30 +46,36 @@ async def upload_pdf(file: UploadFile = File(...)):
     return {
         "filename": file.filename,
         "message": "Upload successful",
-        # Return only the first 500 characters for preview
-        "text": extracted_text[:500],
+        # Return only the first 200 characters for preview
+        "text": extracted_text,
     }
 
 
+# Create BaseModel for /ask API
+class Input(BaseModel):
+    question: str
+    document_text: str
+
+
 @app.post("/ask")
-async def ask_question(
-    question: str = "What is this doc about?", document_text: str = "My name is Jeff"
-):
+async def ask_question(input: Input):
+    question, document_text = input.question, input.document_text
     """Process the user's question with OpenAI."""
     try:
-        # response = openai_client.chat.completions.create(
-        #     # model="gpt-4o-mini",  # Or whichever model you prefer
-        #     model="llama-guard-3-8b",  # Or whichever model you prefer
-        #     messages=[
-        #         {
-        #             "role": "user",
-        #             "content": f"Answer the following question based on the document text:\n\n{document_text}\n\nQuestion: {question}",
-        #         }
-        #     ],
-        #     # response_format={"type": "json_object"},
-        # )
-        # # # max_tokens=150,
-        # answer = response.choices[0].message.content
-        return {"answer": f"Hi my name is: {question}, {document_text[:20]}"}
+        response = openai_client.chat.completions.create(
+            # model="gpt-4o-mini",  # Or whichever model you prefer
+            # model="llama-guard-3-8b",  # Or whichever model you prefer
+            model="deepseek-r1-distill-llama-70b",  # Or whichever model you prefer
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Answer the following question based on the document text:\n\n{document_text}\n\nQuestion: {question}",
+                }
+            ],
+            # response_format={"type": "json_object"},
+        )
+        answer = response.choices[0].message.content
+        # return {"answer": f"Hi my name is: {question}, {document_text[:20]}"}
+        return {"answer": answer}
     except Exception as e:
         return {"error": str(e)}
