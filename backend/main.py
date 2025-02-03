@@ -46,7 +46,6 @@ async def upload_pdf(file: UploadFile = File(...)):
     return {
         "filename": file.filename,
         "message": "Upload successful",
-        # Return only the first 200 characters for preview
         "text": extracted_text,
     }
 
@@ -72,10 +71,8 @@ async def ask_question(input: Input):
                     "content": f"Answer the following question based on the document text:\n\n{document_text}\n\nQuestion: {question}",
                 }
             ],
-            # response_format={"type": "json_object"},
         )
         answer = response.choices[0].message.content
-        # return {"answer": f"Hi my name is: {question}, {document_text[:20]}"}
         return {"answer": answer}
     except Exception as e:
         return {"error": str(e)}
